@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.mydogspies.xflymetar.apis.APIDataIO;
 import com.mydogspies.xflymetar.apis.DataObserverIO;
-import com.mydogspies.xflymetar.apis.DataObserverPacket;
 import com.mydogspies.xflymetar.apis.GetXMLData;
 import com.mydogspies.xflymetar.apis.GetXMLDataSingleton;
+import com.mydogspies.xflymetar.apis.PojoAirport;
+import com.mydogspies.xflymetar.apis.PojoMetar;
+import com.mydogspies.xflymetar.apis.PojoTaf;
 
 public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
@@ -23,16 +26,24 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         GetXMLDataSingleton singleton = GetXMLDataSingleton.getInstance();
         singleton.setHandler(handler);
         handler.addObserver(this);
-        handler.getMetarAsObject(); // TODO this only for dev
+
+        ((APIDataIO) handler).getMetarAsObject("EDDT");
     }
 
-    // TODO only for dev
-    @Override
-    public void updateFromAPI(DataObserverPacket packet) {
+    /* Observer methods for incoming data from tghe APIs */
 
-        GetXMLData.Pojo data = packet.getData();
-        for (GetXMLData.Food item : data.getList()) {
-            System.out.println(item.getName());
-        }
+    @Override
+    public void updateMetarFromAPI(PojoMetar data) {
+        System.out.println("data.getDataType() = " + data.getDataType());
+    }
+
+    @Override
+    public void updateTafFromAPI(PojoTaf data) {
+
+    }
+
+    @Override
+    public void updateAirportFromAPI(PojoAirport data) {
+
     }
 }

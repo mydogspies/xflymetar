@@ -2,5 +2,7 @@ package com.mydogspies.xflymetar.apis;
 
 public interface DataObserverIO {
 
-    void updateFromAPI(DataObserverPacket packet);
+    void updateMetarFromAPI(PojoMetar data);
+    void updateTafFromAPI(PojoTaf data);
+    void updateAirportFromAPI(PojoAirport data);
 }

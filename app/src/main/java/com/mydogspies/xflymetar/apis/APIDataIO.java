@@ -2,5 +2,7 @@ package com.mydogspies.xflymetar.apis;
 
 public interface APIDataIO {
 
-        void getMetarAsObject();
+        void getMetarAsObject(String airport);
+        void getTafAsObject(String airport);
+        void getAirportAsObject(String airport);
 }
