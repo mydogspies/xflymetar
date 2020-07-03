@@ -69,7 +69,7 @@ public class PojoMetar {
     private String sky_cover;
 
     @Path("data/METAR/sky_condition")
-    @Attribute
+    @Attribute(required = false)
     private String cloud_base_ft_agl;
 
     @Path("data/METAR")

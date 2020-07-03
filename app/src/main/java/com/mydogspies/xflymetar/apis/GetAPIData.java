@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Url;
@@ -25,9 +26,9 @@ import retrofit2.http.Url;
  * @see PojoMetar
  * @see PojoTaf
  * @see PojoAirport
- * @see GetXMLDataSingleton
+ * @see GetAPIDataSingleton
  */
-public class GetXMLData implements APIDataIO {
+public class GetAPIData implements APIDataIO {
 
     private final List<DataObserverIO> observers = new ArrayList<>();
 
@@ -35,12 +36,17 @@ public class GetXMLData implements APIDataIO {
 
     interface APIMetar {
         @GET
-        Call<PojoMetar> getAWData(@Url String airportCode);
+        Call<PojoMetar> getAPIxml(@Url String airportCode);
     }
 
     interface APITaf {
         @GET
-        Call<PojoTaf> getAWData(@Url String airportCode);
+        Call<PojoTaf> getAPIxml(@Url String airportCode);
+    }
+
+    interface APIAirport {
+        @GET
+        Call<PojoAirport> getAPIjson(@Url String airportCode);
     }
 
     /* API handler methods */
@@ -62,18 +68,18 @@ public class GetXMLData implements APIDataIO {
                 .build();
 
         APIMetar con = retro.create(APIMetar.class);
-        Call<PojoMetar> call = con.getAWData(url + airportCode);
+        Call<PojoMetar> call = con.getAPIxml(url + airportCode);
 
         call.enqueue(new Callback<PojoMetar>() {
             @Override
             public void onResponse(Call<PojoMetar> call, Response<PojoMetar> response) {
-                Log.i("msginfo: HTTP RESPONSE:", String.valueOf(response.code()));
+                Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
                 setMetarData(response.body());
             }
 
             @Override
             public void onFailure(Call<PojoMetar> call, Throwable t) {
-                Log.e("msginfo: HTTP RESPONSE ERROR:", t.getMessage());
+                Log.e("Xflymetar: HTTP RESPONSE ERROR", t.getMessage());
                 PojoMetar data = new PojoMetar();
                 data.setApiError(true);
                 setMetarData(data);
@@ -91,7 +97,7 @@ public class GetXMLData implements APIDataIO {
     @Override
     public void getTafAsObject(String airportCode) {
 
-        String url = "adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&hoursBeforeNow=0&stationString=";
+        String url = "adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&hoursBeforeNow=.5&stationString=";
 
         Retrofit retro = new Retrofit.Builder()
                 .baseUrl("https://www.aviationweather.gov/")
@@ -99,18 +105,18 @@ public class GetXMLData implements APIDataIO {
                 .build();
 
         APITaf con = retro.create(APITaf.class);
-        Call<PojoTaf> call = con.getAWData(url + airportCode);
+        Call<PojoTaf> call = con.getAPIxml(url + airportCode);
 
         call.enqueue(new Callback<PojoTaf>() {
             @Override
             public void onResponse(Call<PojoTaf> call, Response<PojoTaf> response) {
-                Log.i("msginfo: HTTP RESPONSE:", String.valueOf(response.code()));
+                Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
                 setTafData(response.body());
             }
 
             @Override
             public void onFailure(Call<PojoTaf> call, Throwable t) {
-                Log.e("msginfo: HTTP RESPONSE ERROR:", t.getMessage());
+                Log.e("Xflymetar: HTTP RESPONSE ERROR", t.getMessage());
                 PojoTaf data = new PojoTaf();
                 data.setApiError(true);
                 setTafData(data);
@@ -128,6 +134,33 @@ public class GetXMLData implements APIDataIO {
      */
     @Override
     public void getAirportAsObject(String airportCode) {
+
+        String url = "/nav/airport/";
+
+        Retrofit retro = new Retrofit.Builder()
+                .baseUrl("https://api.flightplandatabase.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        APIAirport con = retro.create(APIAirport.class);
+        Call<PojoAirport> call = con.getAPIjson(url + airportCode);
+
+        call.enqueue(new Callback<PojoAirport>() {
+            @Override
+            public void onResponse(Call<PojoAirport> call, Response<PojoAirport> response) {
+                Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
+                setAirportData(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<PojoAirport> call, Throwable t) {
+                Log.e("Xflymetar: HTTP RESPONSE ERROR", t.getMessage());
+                PojoAirport data = new PojoAirport();
+                data.setApiError(true);
+                setAirportData(data);
+                // TODO implement proper error handling
+            }
+        });
 
     }
 
@@ -160,6 +193,17 @@ public class GetXMLData implements APIDataIO {
 
         for (DataObserverIO dataio : this.observers) {
             dataio.updateTafFromAPI(data);
+        }
+    }
+
+    /**
+     * Feeds the TAF data object to the observers
+     * @param data the incoming object with API taf data
+     */
+    public void setAirportData(PojoAirport data) {
+
+        for (DataObserverIO dataio : this.observers) {
+            dataio.updateAirportFromAPI(data);
         }
     }
 

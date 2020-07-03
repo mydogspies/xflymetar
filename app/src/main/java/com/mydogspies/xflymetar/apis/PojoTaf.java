@@ -115,6 +115,9 @@ public class PojoTaf {
         return forecast;
     }
 
+
+    /* forecast element */
+
     @Root(strict = false)
     public static class Forecast {
 
@@ -130,7 +133,7 @@ public class PojoTaf {
         @Element
         private String wind_speed_kt;
 
-        @Element
+        @Element(required = false)
         private String visibility_statute_mi;
 
         @Element(required = false)
@@ -141,7 +144,7 @@ public class PojoTaf {
         private String sky_cover;
 
         @Path("sky_condition")
-        @Attribute
+        @Attribute(required = false)
         private String cloud_base_ft_agl;
 
         public String getFcst_time_from() {
@@ -170,6 +173,10 @@ public class PojoTaf {
 
         public String getCloud_base_ft_agl() {
             return cloud_base_ft_agl;
+        }
+
+        public String getChange_indicator() {
+            return change_indicator;
         }
     }
 }
