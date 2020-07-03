@@ -12,6 +12,8 @@ import com.mydogspies.xflymetar.apis.PojoAirport;
 import com.mydogspies.xflymetar.apis.PojoMetar;
 import com.mydogspies.xflymetar.apis.PojoTaf;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
     @Override
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         handler.addObserver(this);
 
         ((APIDataIO) handler).getMetarAsObject("EDDT");
+        ((APIDataIO) handler).getTafAsObject("EDDT");
     }
 
     /* Observer methods for incoming data from tghe APIs */
@@ -39,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
     @Override
     public void updateTafFromAPI(PojoTaf data) {
-
+        System.out.println("data.getDataType() = " + data.getDataType());
+        System.out.println(data.getForecast().get(0).getFcst_time_from());
     }
 
     @Override

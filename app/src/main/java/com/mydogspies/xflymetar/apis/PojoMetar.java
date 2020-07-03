@@ -6,7 +6,7 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 
 /**
- * The Retrofit Pojo for the Metar data from aviationweather.gov.
+ * The Retrofit Pojo for the METAR data from aviationweather.gov.
  * The string dataType denotes which API we got data from. In this case it should be "metar".
  *
  * The boolean apiError is set to TRUE if we fail to get a response as a flag since the object is

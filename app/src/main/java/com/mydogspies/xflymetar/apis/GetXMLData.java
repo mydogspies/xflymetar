@@ -3,7 +3,6 @@ package com.mydogspies.xflymetar.apis;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -41,7 +40,7 @@ public class GetXMLData implements APIDataIO {
 
     interface APITaf {
         @GET
-        Call<PojoMetar> getAWData(@Url String airportCode);
+        Call<PojoTaf> getAWData(@Url String airportCode);
     }
 
     /* API handler methods */
@@ -61,8 +60,6 @@ public class GetXMLData implements APIDataIO {
                 .baseUrl("https://www.aviationweather.gov/")
                 .addConverterFactory(SimpleXmlConverterFactory.create())
                 .build();
-
-        // TODO we need HTTP response error handling
 
         APIMetar con = retro.create(APIMetar.class);
         Call<PojoMetar> call = con.getAWData(url + airportCode);
@@ -95,6 +92,31 @@ public class GetXMLData implements APIDataIO {
     public void getTafAsObject(String airportCode) {
 
         String url = "adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&hoursBeforeNow=0&stationString=";
+
+        Retrofit retro = new Retrofit.Builder()
+                .baseUrl("https://www.aviationweather.gov/")
+                .addConverterFactory(SimpleXmlConverterFactory.create())
+                .build();
+
+        APITaf con = retro.create(APITaf.class);
+        Call<PojoTaf> call = con.getAWData(url + airportCode);
+
+        call.enqueue(new Callback<PojoTaf>() {
+            @Override
+            public void onResponse(Call<PojoTaf> call, Response<PojoTaf> response) {
+                Log.i("msginfo: HTTP RESPONSE:", String.valueOf(response.code()));
+                setTafData(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<PojoTaf> call, Throwable t) {
+                Log.e("msginfo: HTTP RESPONSE ERROR:", t.getMessage());
+                PojoTaf data = new PojoTaf();
+                data.setApiError(true);
+                setTafData(data);
+                // TODO implement proper error handling
+            }
+        });
 
     }
 
