@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">xflymetar</string>
+    <string name="about">About</string>
+    <string name="settings">Settings</string>
+    <string name="departure_airport">departure airport</string>
+    <string name="arrival_airport">arrival airport</string>
 </resources>

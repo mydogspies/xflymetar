@@ -127,11 +127,14 @@ public class PojoTaf {
         @Element
         private String fcst_time_to;
 
-        @Element
+        @Element(required = false)
         private String wind_dir_degrees;
 
-        @Element
+        @Element(required = false)
         private String wind_speed_kt;
+
+        @Element(required = false)
+        private String wind_gust_kt;
 
         @Element(required = false)
         private String visibility_statute_mi;
@@ -139,8 +142,11 @@ public class PojoTaf {
         @Element(required = false)
         private String change_indicator;
 
+        @Element(required = false)
+        private String wx_string;
+
         @Path("sky_condition")
-        @Attribute
+        @Attribute(required = false)
         private String sky_cover;
 
         @Path("sky_condition")
@@ -177,6 +183,14 @@ public class PojoTaf {
 
         public String getChange_indicator() {
             return change_indicator;
+        }
+
+        public String getWind_gust_kt() {
+            return wind_gust_kt;
+        }
+
+        public String getWx_string() {
+            return wx_string;
         }
     }
 }
