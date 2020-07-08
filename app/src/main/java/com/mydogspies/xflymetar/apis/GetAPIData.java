@@ -149,6 +149,7 @@ public class GetAPIData implements APIDataIO {
             @Override
             public void onResponse(Call<PojoAirport> call, Response<PojoAirport> response) {
                 Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
+                Log.i("Xflymetar: HTTP MESSAGE", String.valueOf(response.raw()));
                 setAirportData(response.body());
             }
 

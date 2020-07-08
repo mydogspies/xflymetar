@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-public class MetarView extends Fragment implements ViewLogic {
+public class TafView extends Fragment implements ViewLogic{
 
     private View view;
     private ConstraintLayout viewContainer;
@@ -18,14 +18,14 @@ public class MetarView extends Fragment implements ViewLogic {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.metar_readout, container, false);
+        view = inflater.inflate(R.layout.taf_readout, container, false);
         return view;
         // return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        viewContainer = view.findViewById(R.id.metarReadoutContainer);
+        viewContainer = view.findViewById(R.id.tafReadoutContainer);
         super.onViewCreated(view, savedInstanceState);
     }
 

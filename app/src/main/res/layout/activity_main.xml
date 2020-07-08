@@ -10,7 +10,7 @@
     <LinearLayout
         android:id="@+id/depAirportContainer"
         android:layout_width="match_parent"
-        android:layout_height="66dp"
+        android:layout_height="74dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
@@ -20,9 +20,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/departureAirportInfoIcon"
             android:layout_width="wrap_content"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
             app:srcCompat="@drawable/icons8_answers_64" />
 
@@ -43,18 +44,22 @@
             <EditText
                 android:id="@+id/departAirportInputText"
                 android:layout_width="150dp"
-                android:layout_height="45dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
                 android:ems="10"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:textAlignment="center"
-                android:textSize="24sp"
-                android:imeOptions="actionDone"/>
+                android:textSize="22sp"
+                app:layout_constraintTop_toBottomOf="@id/departAirportHeaderText" />
+
         </LinearLayout>
 
         <ImageView
             android:id="@+id/imageGreenGo"
             android:layout_width="wrap_content"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
             app:srcCompat="@drawable/icons8_checkmark_64" />
 
@@ -64,7 +69,7 @@
     <LinearLayout
         android:id="@+id/arrAirportContainer"
         android:layout_width="match_parent"
-        android:layout_height="66dp"
+        android:layout_height="74dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
@@ -74,9 +79,10 @@
         app:layout_constraintTop_toBottomOf="@id/depAirportContainer">
 
         <ImageView
-            android:id="@+id/imageView5"
+            android:id="@+id/arrivalAirportInfoIcon"
             android:layout_width="wrap_content"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
             app:srcCompat="@drawable/icons8_answers_64" />
 
@@ -97,18 +103,21 @@
             <EditText
                 android:id="@+id/arrivalAirportInputText"
                 android:layout_width="150dp"
-                android:layout_height="45dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
                 android:ems="10"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:textAlignment="center"
-                android:textSize="24sp"
-                android:imeOptions="actionDone" />
+                android:textSize="22sp"
+                app:layout_constraintTop_toBottomOf="@id/arrivalAirportHeaderText" />
         </LinearLayout>
 
         <ImageView
             android:id="@+id/imageGreenGo2"
             android:layout_width="wrap_content"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
             app:srcCompat="@drawable/icons8_checkmark_64" />
 
@@ -118,7 +127,9 @@
         android:id="@+id/departTopDivider"
         style="@style/Divider"
         android:layout_height="2dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/arrAirportContainer" />
@@ -133,13 +144,22 @@
         app:layout_constraintTop_toBottomOf="@id/departTopDivider">
 
         <LinearLayout
-            android:id="@+id/metarViewContainer"
+            android:id="@+id/dataViewContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
+            <LinearLayout
+                android:id="@+id/airportDataContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -4,4 +4,7 @@
     <string name="settings">Settings</string>
     <string name="departure_airport">departure airport</string>
     <string name="arrival_airport">arrival airport</string>
+    <string name="arrival_metar">ARRIVAL METAR</string>
+    <string name="arrival_taf">ARRIVAL TAF</string>
+    <string name="departure_metar">DEPARTURE METAR</string>
 </resources>
