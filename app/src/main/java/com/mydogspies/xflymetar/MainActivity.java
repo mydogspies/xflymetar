@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.EditText;
@@ -24,6 +23,7 @@ import com.mydogspies.xflymetar.apis.PojoMetar;
 import com.mydogspies.xflymetar.apis.PojoTaf;
 import com.mydogspies.xflymetar.parser.Validators;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +31,15 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
     private ViewStyles STYLES = new ViewStyles();
     private Validators validator = new Validators();
+
+    // All the current view fragments - populated by initAirportInputs() by fragment loading.
+    // This global is the used to have a direct reference to each fragment, for example for the
+    // visibility logic.
     public static Map<ViewState, Object> dataViewObjects;
+
+    // This is the global saved api data map - initialized in initAPIDataMap().
+    public static Map<ViewState, Map<Date, Object>> savedAPIData;
+    public static Map<ViewState, Date> apiTimeStamps;
 
     ConstraintLayout mainLayout;
     EditText departAirportInputText;
@@ -59,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
     private void init() {
         dataViewObjects = new HashMap<>();
+        initAPIDataMap();
 
         GetAPIData handler = new GetAPIData();
         GetAPIDataSingleton singleton = GetAPIDataSingleton.getInstance();
@@ -74,17 +83,29 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         // ((APIDataIO) handler).getAirportAsObject("EDDT");
     }
 
+    /**
+     * Using a date in the past this method initializes the time stamp map in order to
+     * trigger the API logic to update the data from the very start without the need for
+     * a separate init method.
+     */
+    private void initAPIDataMap() {
+        apiTimeStamps = new HashMap<>();
+        Date date = new Date(1);
+        apiTimeStamps.put(ViewState.DEPARTURE, date);
+        apiTimeStamps.put(ViewState.ARRIVAL, date);
+    }
+
 
     /* METHODS FOR LOADING FRAGMENTS */
 
-    private void loadDataViews(Fragment fragment, String icaoCode) {
+    private void loadDataViews(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.dataViewContainer, fragment);
         fragmentTransaction.commit();
     }
 
-    private void loadAirportView(Fragment fragment, String icaoCode) {
+    private void loadAirportView(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.airportDataContainer, fragment);
@@ -142,30 +163,39 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         // Listener logic for the ICAO code input field
         // Calls the methods for attaching the various fragments with data views
-        departAirportInputText.setOnKeyListener((view, i, keyEvent) -> {
-            String airportCode = departAirportInputText.getText().toString();
+//        departAirportInputText.setOnKeyListener((view, i, keyEvent) -> {
+//            String airportCode = departAirportInputText.getText().toString();
+//
+//            if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_ENTER) {
+//
+//                if (validator.validateIcaoCode(airportCode)) {
+//                    loadDataViews(new HeaderElementViews(ViewState.DEPARTURE), airportCode);
+//                    MetarView metarView = new MetarView();
+//                    loadDataViews(metarView, airportCode);
+//                    dataViewObjects.put(ViewState.DEPARTURE, metarView);
+//
+//                    AirportView airportView = new AirportView();
+//                    loadAirportView(airportView, airportCode);
+//                    dataViewObjects.put(ViewState.DEPARTURE_AIRPORT, airportView);
+//                    return true;
+//                }
+//            }
+//            return false;
+//        });
 
-            if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_ENTER) {
+        loadDataViews(new HeaderElementViews(ViewState.DEPARTURE));
+        MetarView departureMetarView = new MetarView();
+        loadDataViews(departureMetarView);
+        dataViewObjects.put(ViewState.DEPARTURE, departureMetarView);
 
-                if (validator.validateIcaoCode(airportCode)) {
-                    loadDataViews(new DataViews(ViewState.DEPARTURE), airportCode);
-                    MetarView metarView = new MetarView();
-                    loadDataViews(metarView, airportCode);
-                    dataViewObjects.put(ViewState.DEPARTURE, metarView);
-
-                    AirportView airportView = new AirportView();
-                    loadAirportView(airportView, airportCode);
-                    dataViewObjects.put(ViewState.DEPARTURE_AIRPORT, airportView);
-                    return true;
-                }
-            }
-            return false;
-        });
+        AirportView departureAirportView = new AirportView();
+        loadAirportView(departureAirportView);
+        dataViewObjects.put(ViewState.DEPARTURE_AIRPORT, departureAirportView);
 
         // Listener and visibility logic for the airport info icon
         departureAirportIcon = findViewById(R.id.departureAirportInfoIcon);
         departureAirportIcon.setOnClickListener(view -> {
-            setDepartureAirportVisiblity();
+            setDepartureAirportVisibility();
         });
 
 
@@ -174,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         // Listener and visibility logic for the airport info icon
         arrivalAirportIcon = findViewById(R.id.arrivalAirportInfoIcon);
         arrivalAirportIcon.setOnClickListener(view -> {
-            setarrivalAirportVisiblity();
+            setArrivalAirportVisibility();
         });
 
         arrivalAirportInputText = findViewById(R.id.arrivalAirportInputText);
@@ -185,35 +215,49 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         // Listener logic for the ICAO code input field
         // Calls the methods for attaching the various fragments with data views
-        arrivalAirportInputText.setOnKeyListener((view, i, keyEvent) -> {
-            String airportCode = departAirportInputText.getText().toString();
+//        arrivalAirportInputText.setOnKeyListener((view, i, keyEvent) -> {
+//            String airportCode = departAirportInputText.getText().toString();
+//
+//            if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_ENTER) {
+//
+//                if (validator.validateIcaoCode(airportCode)) {
+//                    loadDataViews(new HeaderElementViews(ViewState.ARRIVAL), airportCode);
+//                    MetarView metarView = new MetarView();
+//                    loadDataViews(metarView, airportCode);
+//                    dataViewObjects.put(ViewState.ARRIVAL, metarView);
+//
+//                    AirportView airportView = new AirportView();
+//                    loadAirportView(airportView, airportCode);
+//                    dataViewObjects.put(ViewState.ARRIVAL_AIRPORT, airportView);
+//
+//                    loadDataViews(new HeaderElementViews(ViewState.TAF), airportCode);
+//                    TafView tafView = new TafView();
+//                    loadDataViews(tafView, airportCode);
+//                    dataViewObjects.put(ViewState.TAF, tafView);
+//                    return true;
+//                }
+//            }
+//            return false;
+//        });
 
-            if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_ENTER) {
+        loadDataViews(new HeaderElementViews(ViewState.ARRIVAL));
+        MetarView arrivalMetarView = new MetarView();
+        loadDataViews(arrivalMetarView);
+        dataViewObjects.put(ViewState.ARRIVAL, arrivalMetarView);
 
-                if (validator.validateIcaoCode(airportCode)) {
-                    loadDataViews(new DataViews(ViewState.ARRIVAL), airportCode);
-                    MetarView metarView = new MetarView();
-                    loadDataViews(metarView, airportCode);
-                    dataViewObjects.put(ViewState.ARRIVAL, metarView);
+        AirportView arrivalAirportView = new AirportView();
+        loadAirportView(arrivalAirportView);
+        dataViewObjects.put(ViewState.ARRIVAL_AIRPORT, arrivalAirportView);
 
-                    AirportView airportView = new AirportView();
-                    loadAirportView(airportView, airportCode);
-                    dataViewObjects.put(ViewState.ARRIVAL_AIRPORT, airportView);
-
-                    loadDataViews(new DataViews(ViewState.TAF), airportCode);
-                    TafView tafView = new TafView();
-                    loadDataViews(tafView, airportCode);
-                    dataViewObjects.put(ViewState.TAF, tafView);
-                    return true;
-                }
-            }
-            return false;
-        });
+        loadDataViews(new HeaderElementViews(ViewState.TAF));
+        TafView tafView = new TafView();
+        loadDataViews(tafView);
+        dataViewObjects.put(ViewState.TAF, tafView);
     }
 
     /* VISIBILITY OF AIRPORT INFO FRAGMENTS */
 
-    public void setDepartureAirportVisiblity() {
+    public void setDepartureAirportVisibility() {
         AirportView airportView = (AirportView) dataViewObjects.get(ViewState.DEPARTURE_AIRPORT);
 
         if(departureAirportVisibility && airportView != null) {
@@ -225,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         }
     }
 
-    public void setarrivalAirportVisiblity() {
+    public void setArrivalAirportVisibility() {
         AirportView airportView = (AirportView) dataViewObjects.get(ViewState.ARRIVAL_AIRPORT);
 
         if(arrivalAirportVisibility && airportView != null) {
@@ -236,4 +280,6 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
             arrivalAirportVisibility = true;
         }
     }
+
+
 }
