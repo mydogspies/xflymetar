@@ -10,7 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-public class TafView extends Fragment implements ViewLogic{
+import com.mydogspies.xflymetar.apis.DataObserverIO;
+import com.mydogspies.xflymetar.data.Metar;
+import com.mydogspies.xflymetar.data.Taf;
+
+public class TafView extends Fragment implements ViewLogic, DataObserverIO {
 
     private View view;
     private ConstraintLayout viewContainer;
@@ -36,5 +40,13 @@ public class TafView extends Fragment implements ViewLogic{
         } else {
             viewContainer.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void updateMetarFromAPI(VIEWSTATE state, Metar metar) {}
+
+    @Override
+    public void updateTafFromAPI(VIEWSTATE state, Taf taf) {
+
     }
 }

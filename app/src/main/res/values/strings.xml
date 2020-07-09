@@ -4,7 +4,14 @@
     <string name="settings">Settings</string>
     <string name="departure_airport">departure airport</string>
     <string name="arrival_airport">arrival airport</string>
-    <string name="arrival_metar">ARRIVAL METAR</string>
-    <string name="arrival_taf">ARRIVAL TAF</string>
-    <string name="departure_metar">DEPARTURE METAR</string>
+
+    <string name="arrival_metar">ARRIVAL METAR: %1$s [%2$s]</string>
+    <string name="arrival_taf">ARRIVAL TAF:  %1$s [%2$s]</string>
+    <string name="departure_metar">DEPARTURE METAR:  %1$s [%2$s]</string>
+    <string name="departure_taf">DEPARTURE TAF:  %1$s [%2$s]</string>
+
+    <string name="arrival_metar_no_data">ARRIVAL METAR: Data or code error!</string>
+    <string name="arrival_taf_no_data">ARRIVAL TAF: Data or code error!</string>
+    <string name="departure_metar_no_data">DEPARTURE METAR: Data or code error!</string>
+    <string name="departure_taf_no_data">DEPARTURE TAF: Data or code error!</string>
 </resources>
