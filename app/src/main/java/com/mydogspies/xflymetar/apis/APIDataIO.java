@@ -1,8 +1,12 @@
 package com.mydogspies.xflymetar.apis;
 
+import com.mydogspies.xflymetar.VIEWSTATE;
+
 public interface APIDataIO {
 
-        void getMetarAsObject(String airport);
-        void getTafAsObject(String airport);
-        void getAirportAsObject(String airport);
+        void loadMetarFromAPI(VIEWSTATE state, String airport);
+        void loadTafFromAPI(VIEWSTATE state, String airport);
+
+        // The refresh time interval in milliseconds for the API
+        long getAPIDataUpdateTime();
 }

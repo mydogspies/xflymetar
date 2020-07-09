@@ -23,6 +23,10 @@ public class PojoTaf {
     private String dataType = "taf";
     private boolean apiError = false;
 
+    @Path("data")
+    @Attribute
+    private int num_results;
+
     @Path("data/TAF")
     @Element
     private String raw_text;
@@ -49,15 +53,15 @@ public class PojoTaf {
 
     @Path("data/TAF")
     @Element
-    private String latitude;
+    private double latitude;
 
     @Path("data/TAF")
     @Element
-    private String longitude;
+    private double longitude;
 
     @Path("data/TAF")
     @Element
-    private String elevation_m;
+    private double elevation_m;
 
     @Path("data/TAF")
     @ElementList(inline = true)
@@ -73,6 +77,10 @@ public class PojoTaf {
 
     public boolean isApiError() {
         return apiError;
+    }
+
+    public int getNum_results() {
+        return num_results;
     }
 
     public String getRaw_text() {
@@ -99,22 +107,21 @@ public class PojoTaf {
         return valid_time_to;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public String getElevation_m() {
+    public double getElevation_m() {
         return elevation_m;
     }
 
     public List<Forecast> getForecast() {
         return forecast;
     }
-
 
     /* forecast element */
 
@@ -128,16 +135,16 @@ public class PojoTaf {
         private String fcst_time_to;
 
         @Element(required = false)
-        private String wind_dir_degrees;
+        private int wind_dir_degrees;
 
         @Element(required = false)
-        private String wind_speed_kt;
+        private int wind_speed_kt;
 
         @Element(required = false)
-        private String wind_gust_kt;
+        private int wind_gust_kt;
 
         @Element(required = false)
-        private String visibility_statute_mi;
+        private float visibility_statute_mi;
 
         @Element(required = false)
         private String change_indicator;
@@ -151,7 +158,7 @@ public class PojoTaf {
 
         @Path("sky_condition")
         @Attribute(required = false)
-        private String cloud_base_ft_agl;
+        private int cloud_base_ft_agl;
 
         public String getFcst_time_from() {
             return fcst_time_from;
@@ -161,36 +168,36 @@ public class PojoTaf {
             return fcst_time_to;
         }
 
-        public String getWind_dir_degrees() {
+        public int getWind_dir_degrees() {
             return wind_dir_degrees;
         }
 
-        public String getWind_speed_kt() {
+        public int getWind_speed_kt() {
             return wind_speed_kt;
         }
 
-        public String getVisibility_statute_mi() {
+        public int getWind_gust_kt() {
+            return wind_gust_kt;
+        }
+
+        public float getVisibility_statute_mi() {
             return visibility_statute_mi;
-        }
-
-        public String getSky_cover() {
-            return sky_cover;
-        }
-
-        public String getCloud_base_ft_agl() {
-            return cloud_base_ft_agl;
         }
 
         public String getChange_indicator() {
             return change_indicator;
         }
 
-        public String getWind_gust_kt() {
-            return wind_gust_kt;
-        }
-
         public String getWx_string() {
             return wx_string;
+        }
+
+        public String getSky_cover() {
+            return sky_cover;
+        }
+
+        public int getCloud_base_ft_agl() {
+            return cloud_base_ft_agl;
         }
     }
 }

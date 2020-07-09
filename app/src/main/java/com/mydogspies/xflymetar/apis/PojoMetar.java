@@ -34,35 +34,35 @@ public class PojoMetar {
 
     @Path("data/METAR")
     @Element
-    private String latitude;
+    private double latitude;
 
     @Path("data/METAR")
     @Element
-    private String longitude;
+    private double longitude;
 
     @Path("data/METAR")
     @Element
-    private String temp_c;
+    private float temp_c;
 
     @Path("data/METAR")
     @Element
-    private String dewpoint_c;
+    private float dewpoint_c;
 
     @Path("data/METAR")
     @Element
-    private String wind_dir_degrees;
+    private int wind_dir_degrees;
 
     @Path("data/METAR")
     @Element
-    private String wind_speed_kt;
+    private int wind_speed_kt;
 
     @Path("data/METAR")
     @Element
-    private String visibility_statute_mi;
+    private float visibility_statute_mi;
 
     @Path("data/METAR")
     @Element
-    private String altim_in_hg;
+    private double altim_in_hg;
 
     @Path("data/METAR/sky_condition")
     @Attribute
@@ -70,7 +70,7 @@ public class PojoMetar {
 
     @Path("data/METAR/sky_condition")
     @Attribute(required = false)
-    private String cloud_base_ft_agl;
+    private int cloud_base_ft_agl;
 
     @Path("data/METAR")
     @Element
@@ -78,18 +78,18 @@ public class PojoMetar {
 
     @Path("data/METAR")
     @Element
-    private String elevation_m;
+    private double elevation_m;
 
-    public boolean isApiError() {
-        return apiError;
+    public String getDataType() {
+        return dataType;
     }
 
     public void setApiError(boolean apiError) {
         this.apiError = apiError;
     }
 
-    public String getDataType() {
-        return dataType;
+    public boolean isApiError() {
+        return apiError;
     }
 
     public String getRaw_text() {
@@ -104,35 +104,35 @@ public class PojoMetar {
         return observation_time;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public String getTemp_c() {
+    public float getTemp_c() {
         return temp_c;
     }
 
-    public String getDewpoint_c() {
+    public float getDewpoint_c() {
         return dewpoint_c;
     }
 
-    public String getWind_dir_degrees() {
+    public int getWind_dir_degrees() {
         return wind_dir_degrees;
     }
 
-    public String getWind_speed_kt() {
+    public int getWind_speed_kt() {
         return wind_speed_kt;
     }
 
-    public String getVisibility_statute_mi() {
+    public float getVisibility_statute_mi() {
         return visibility_statute_mi;
     }
 
-    public String getAltim_in_hg() {
+    public double getAltim_in_hg() {
         return altim_in_hg;
     }
 
@@ -140,7 +140,7 @@ public class PojoMetar {
         return sky_cover;
     }
 
-    public String getCloud_base_ft_agl() {
+    public int getCloud_base_ft_agl() {
         return cloud_base_ft_agl;
     }
 
@@ -148,7 +148,7 @@ public class PojoMetar {
         return flight_category;
     }
 
-    public String getElevation_m() {
+    public double getElevation_m() {
         return elevation_m;
     }
 }

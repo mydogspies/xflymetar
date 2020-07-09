@@ -11,26 +11,21 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.mydogspies.xflymetar.apis.APIDataIO;
-import com.mydogspies.xflymetar.apis.GetAPIDataSingleton;
-
-import java.util.Date;
-import java.util.Map;
+import com.mydogspies.xflymetar.apis.APIDataSingleton;
 
 
 public class MetarView extends Fragment implements ViewLogic {
 
-    private static APIDataIO apiIO = GetAPIDataSingleton.getInstance().getHandler();
+    private static APIDataIO apiIO = APIDataSingleton.getInstance().getHandler();
 
     private View view;
     private ConstraintLayout viewContainer;
-    private Map<ViewState, Map<Date, Object>> apiData = MainActivity.savedAPIData;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.metar_readout, container, false);
         return view;
-        // return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override

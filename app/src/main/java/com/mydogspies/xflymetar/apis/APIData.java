@@ -2,14 +2,21 @@ package com.mydogspies.xflymetar.apis;
 
 import android.util.Log;
 
+import com.mydogspies.xflymetar.MainActivity;
+import com.mydogspies.xflymetar.VIEWSTATE;
+import com.mydogspies.xflymetar.data.Metar;
+import com.mydogspies.xflymetar.data.Taf;
+import com.mydogspies.xflymetar.parser.RawAPIDataParser;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Url;
@@ -21,18 +28,23 @@ import retrofit2.http.Url;
  * setData() method which waits for all responses, handles global timeout and feeds the observers.
  * NOTE: This class is the Subject of the Observer network and all observers must subscribe to it
  * using the GetXMLDataSingleton method. See MainActivity in the init() method for basic example.
+ *
  * @author github.com/mydogspies
- * @since 0.1.0
  * @see PojoMetar
  * @see PojoTaf
  * @see PojoAirport
- * @see GetAPIDataSingleton
+ * @see APIDataSingleton
+ * @since 0.1.0
  */
-public class GetAPIData implements APIDataIO {
+public class APIData implements APIDataIO {
 
     private final List<DataObserverIO> observers = new ArrayList<>();
+    private RawAPIDataParser dataParser = new RawAPIDataParser();
+    private Map<VIEWSTATE, Date> timestampMap = MainActivity.apiTimeStamps;
+    private Map<VIEWSTATE, Object> currentAPIData = MainActivity.currentAPIData;
 
-    /* Interfaces for Retrofit */
+
+    /* INTERFACES FOR RETROFIT */
 
     interface APIMetar {
         @GET
@@ -44,23 +56,20 @@ public class GetAPIData implements APIDataIO {
         Call<PojoTaf> getAPIxml(@Url String airportCode);
     }
 
-    interface APIAirport {
-        @GET
-        Call<PojoAirport> getAPIjson(@Url String airportCode);
-    }
 
-    /* API handler methods */
+    /* API HANDLER METHODS */
 
     /**
      * Grabs the METAR data using airport code as argument.
      * Returns a data object to the setData() method. Note that in case of error
      * the method still sends an object with the correct instance variable set to flag an error.
+     *
      * @param airportCode single airport ICAO code
      */
     @Override
-    public void getMetarAsObject(String airportCode) {
+    public void loadMetarFromAPI(VIEWSTATE state, String airportCode) {
 
-        String url = "adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=.5&stationString=";
+        String url = "adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&stationString=" + airportCode;
 
         Retrofit retro = new Retrofit.Builder()
                 .baseUrl("https://www.aviationweather.gov/")
@@ -68,21 +77,22 @@ public class GetAPIData implements APIDataIO {
                 .build();
 
         APIMetar con = retro.create(APIMetar.class);
-        Call<PojoMetar> call = con.getAPIxml(url + airportCode);
+        Call<PojoMetar> call = con.getAPIxml(url);
 
         call.enqueue(new Callback<PojoMetar>() {
             @Override
             public void onResponse(Call<PojoMetar> call, Response<PojoMetar> response) {
-                Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
-                setMetarData(response.body());
+                Log.i("Xflymetar: (METAR) HTTP RESPONSE", String.valueOf(response.code()));
+                Log.i("Xflymetar: (METAR) HTTP BODY", String.valueOf(response.body().getRaw_text()));
+                setMetarData(state, response.body());
             }
 
             @Override
             public void onFailure(Call<PojoMetar> call, Throwable t) {
-                Log.e("Xflymetar: HTTP RESPONSE ERROR", t.getMessage());
+                Log.e("Xflymetar: (METAR) HTTP RESPONSE ERROR", t.getMessage());
                 PojoMetar data = new PojoMetar();
                 data.setApiError(true);
-                setMetarData(data);
+                setMetarData(state, data);
                 // TODO implement proper error handling
             }
         });
@@ -92,12 +102,13 @@ public class GetAPIData implements APIDataIO {
      * Grabs the TAF data using airport code as argument.
      * Returns a data object to the setData() method. Note that in case of error
      * the method still sends an object with the correct instance variable set to flag an error.
+     *
      * @param airportCode single airport ICAO code
      */
     @Override
-    public void getTafAsObject(String airportCode) {
+    public void loadTafFromAPI(VIEWSTATE state, String airportCode) {
 
-        String url = "adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&hoursBeforeNow=.5&stationString=";
+        String url = "adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&hoursBeforeNow=.5&stationString=" + airportCode;
 
         Retrofit retro = new Retrofit.Builder()
                 .baseUrl("https://www.aviationweather.gov/")
@@ -105,67 +116,40 @@ public class GetAPIData implements APIDataIO {
                 .build();
 
         APITaf con = retro.create(APITaf.class);
-        Call<PojoTaf> call = con.getAPIxml(url + airportCode);
+        Call<PojoTaf> call = con.getAPIxml(url);
 
         call.enqueue(new Callback<PojoTaf>() {
             @Override
             public void onResponse(Call<PojoTaf> call, Response<PojoTaf> response) {
-                Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
-                setTafData(response.body());
+                Log.i("Xflymetar: (TAF) HTTP RESPONSE", String.valueOf(response.code()));
+                Log.i("Xflymetar: (TAF) HTTP BODY", String.valueOf(response.body().getRaw_text()));
+                setTafData(state, response.body());
             }
 
             @Override
             public void onFailure(Call<PojoTaf> call, Throwable t) {
-                Log.e("Xflymetar: HTTP RESPONSE ERROR", t.getMessage());
+                Log.e("Xflymetar: (TAF) HTTP RESPONSE ERROR", t.getMessage());
                 PojoTaf data = new PojoTaf();
                 data.setApiError(true);
-                setTafData(data);
+                setTafData(state, data);
                 // TODO implement proper error handling
             }
         });
-
     }
 
     /**
-     * Grabs the AIRPORT data using airport code as argument.
-     * Returns a data object to the setData() method. Note that in case of error
-     * the method still sends an object with the correct instance variable set to flag an error.
-     * @param airportCode single airport ICAO code
+     * Simply the time interval with which this specific API updates its data feed.
+     * In this case it's 10 minute intervals.
+     *
+     * @return api refresh time in milliseconds
      */
     @Override
-    public void getAirportAsObject(String airportCode) {
-
-        String url = "/nav/airport/";
-
-        Retrofit retro = new Retrofit.Builder()
-                .baseUrl("https://api.flightplandatabase.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        APIAirport con = retro.create(APIAirport.class);
-        Call<PojoAirport> call = con.getAPIjson(url + airportCode);
-
-        call.enqueue(new Callback<PojoAirport>() {
-            @Override
-            public void onResponse(Call<PojoAirport> call, Response<PojoAirport> response) {
-                Log.i("Xflymetar: HTTP RESPONSE", String.valueOf(response.code()));
-                Log.i("Xflymetar: HTTP MESSAGE", String.valueOf(response.raw()));
-                setAirportData(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<PojoAirport> call, Throwable t) {
-                Log.e("Xflymetar: HTTP RESPONSE ERROR", t.getMessage());
-                PojoAirport data = new PojoAirport();
-                data.setApiError(true);
-                setAirportData(data);
-                // TODO implement proper error handling
-            }
-        });
-
+    public long getAPIDataUpdateTime() {
+        return 660000;
     }
 
-    /* The observable methods */
+
+    /* OBSERVER METHODS */
 
     public void addObserver(DataObserverIO dataio) {
         this.observers.add(dataio);
@@ -176,46 +160,53 @@ public class GetAPIData implements APIDataIO {
     }
 
     /**
-     * Feeds the METAR data object to the observers
+     * Parses and feeds the fresh METAR data object to the observers
      * @param data the incoming object with API metar data
+     * @param state
      */
-    public void setMetarData(PojoMetar data) {
+    public void setMetarData(VIEWSTATE state, PojoMetar data) {
+        Metar metar = dataParser.parseMetarPojo(state, data);
+        timestampMap.replace(state, new Date());
 
         for (DataObserverIO dataio : this.observers) {
-            dataio.updateMetarFromAPI(data);
+            dataio.updateMetarFromAPI(state, metar);
         }
     }
 
     /**
-     * Feeds the TAF data object to the observers
-     * @param data the incoming object with API taf data
+     * Parses and feeds the fresh TAF data object to the observers
+     * @param data the incoming object with API metar data
+     * @param state
      */
-    public void setTafData(PojoTaf data) {
+    public void setTafData(VIEWSTATE state, PojoTaf data) {
+        Taf taf = dataParser.parseTafPojo(state, data);
+        timestampMap.replace(state, new Date());
 
         for (DataObserverIO dataio : this.observers) {
-            dataio.updateTafFromAPI(data);
+            dataio.updateTafFromAPI(state, taf);
         }
     }
 
     /**
-     * Feeds the TAF data object to the observers
-     * @param data the incoming object with API taf data
+     * Looks up the saved METAR object and pushes it to the observer network.
+     * @param state
      */
-    public void setAirportData(PojoAirport data) {
-
+    public void getSavedMetarData(VIEWSTATE state) {
+        Metar currentData = (Metar) currentAPIData.get(state);
         for (DataObserverIO dataio : this.observers) {
-            dataio.updateAirportFromAPI(data);
+            dataio.updateMetarFromAPI(state, currentData);
         }
     }
 
     /**
-     * Feeds the AIRPORT data object to the observers
-     * @param data the incoming object with API airport data
+     * Looks up the saved TAF object and pushes it to the observer network.
+     * @param state
      */
-    public void setMetarData(PojoAirport data) {
-
+    public void getSavedTafData(VIEWSTATE state) {
+        Taf currentData = (Taf) currentAPIData.get(state);
         for (DataObserverIO dataio : this.observers) {
-            dataio.updateAirportFromAPI(data);
+            dataio.updateTafFromAPI(state, currentData);
         }
     }
 }
+
