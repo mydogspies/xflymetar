@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.mydogspies.xflymetar.MainActivity;
-import com.mydogspies.xflymetar.MetarView;
 import com.mydogspies.xflymetar.R;
 import com.mydogspies.xflymetar.VIEWSTATE;
 import com.mydogspies.xflymetar.ViewLogic;
@@ -112,7 +111,7 @@ public class ArrivalMetarHeader extends Fragment implements DataObserverIO {
 
         headerText = view.findViewById(R.id.dataTypeText);
         headerText.setTextColor(Color.parseColor(STYLES.TEXT_COLOR));
-        headerText.setText(R.string.arrival_metar);
+        headerText.setText(R.string.arrival_metar_init);
     }
 
 

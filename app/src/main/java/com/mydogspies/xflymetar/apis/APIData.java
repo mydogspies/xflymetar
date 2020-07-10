@@ -12,11 +12,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.Retrofit.Builder;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Url;
@@ -25,15 +28,18 @@ import retrofit2.http.Url;
  * This class uses Retrofit and the Simple XML serialization network in order to grab Metar, Taf and Airport data.
  * It uses Retrofit-style pojos, one for each API call, and serializes them into objects. Each call
  * uses a separate thread as defined by the call.enqueue method and returns each object into the
- * setData() method which waits for all responses, handles global timeout and feeds the observers.
+ * setMetar/TafData() method which feeds the observers.
+ *
  * NOTE: This class is the Subject of the Observer network and all observers must subscribe to it
- * using the GetXMLDataSingleton method. See MainActivity in the init() method for basic example.
+ * using the API handler's addObserver() method via a call to the APIDataSingleton.
+ * See MetarView.class in the fragments folder for an example.
  *
  * @author github.com/mydogspies
  * @see PojoMetar
  * @see PojoTaf
  * @see PojoAirport
  * @see APIDataSingleton
+ * @see com.mydogspies.xflymetar.fragments.MetarView
  * @since 0.1.0
  */
 public class APIData implements APIDataIO {
@@ -71,9 +77,15 @@ public class APIData implements APIDataIO {
 
         String url = "adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&stationString=" + airportCode;
 
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(6, TimeUnit.SECONDS)
+                .connectTimeout(6, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retro = new Retrofit.Builder()
                 .baseUrl("https://www.aviationweather.gov/")
                 .addConverterFactory(SimpleXmlConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         APIMetar con = retro.create(APIMetar.class);
@@ -110,9 +122,15 @@ public class APIData implements APIDataIO {
 
         String url = "adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&hoursBeforeNow=.5&stationString=" + airportCode;
 
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(6, TimeUnit.SECONDS)
+                .connectTimeout(6, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retro = new Retrofit.Builder()
                 .baseUrl("https://www.aviationweather.gov/")
                 .addConverterFactory(SimpleXmlConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         APITaf con = retro.create(APITaf.class);
@@ -151,6 +169,18 @@ public class APIData implements APIDataIO {
 
     /* OBSERVER METHODS */
 
+    /**
+     * This is the method all classes that want to subscribe to the data must use to add
+     * an instance of themselves to. This method should NEVER be called directly - only through the
+     * APIDatASingleton instance. See MetarView.class in the fragment folder for an example.
+     *
+     * @param dataio the class wanting to add itself must implement DataObserverIO and add itself
+     * as parameter here.
+     * @see DataObserverIO
+     * @see APIDataSingleton
+     * @see com.mydogspies.xflymetar.fragments.MetarView
+     *
+     */
     public void addObserver(DataObserverIO dataio) {
         this.observers.add(dataio);
     }

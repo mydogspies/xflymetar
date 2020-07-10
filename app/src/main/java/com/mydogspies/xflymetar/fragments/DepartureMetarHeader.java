@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.mydogspies.xflymetar.MainActivity;
-import com.mydogspies.xflymetar.MetarView;
 import com.mydogspies.xflymetar.R;
 import com.mydogspies.xflymetar.VIEWSTATE;
 import com.mydogspies.xflymetar.ViewLogic;
@@ -25,6 +24,14 @@ import com.mydogspies.xflymetar.apis.DataObserverIO;
 import com.mydogspies.xflymetar.data.Metar;
 import com.mydogspies.xflymetar.data.Taf;
 
+/**
+ * This is the header fragment above each data readout (METAR or TAF) view that also contains the
+ * expand/hide icon.
+ * Note that this class must add itself to the observer network via the addObserver() method in
+ * the constructor.
+ * @author github.com/mydogspies
+ * @since 0.1.0
+ */
 public class DepartureMetarHeader  extends Fragment implements DataObserverIO {
 
     private static APIData apiHandler = APIDataSingleton.getInstance().getHandler();
@@ -93,7 +100,7 @@ public class DepartureMetarHeader  extends Fragment implements DataObserverIO {
     @Override
     public void updateMetarFromAPI(VIEWSTATE state, Metar metar) {
         if (state.equals(VIEWSTATE.DEPARTURE_METAR)) {
-            if (metar.getStationID() != null) {
+            if (metar != null && metar.getStationID() != null) {
                 headerText.setText(getString(R.string.departure_metar, metar.getStationID(), metar.getObservationTime()));
             } else {
                 headerText.setText(getString(R.string.departure_metar_no_data));
@@ -115,7 +122,7 @@ public class DepartureMetarHeader  extends Fragment implements DataObserverIO {
 
         headerText = view.findViewById(R.id.dataTypeText);
         headerText.setTextColor(Color.parseColor(STYLES.TEXT_COLOR));
-        headerText.setText(R.string.departure_metar);
+        headerText.setText(R.string.departure_metar_init);
     }
 
 

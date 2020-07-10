@@ -4,6 +4,12 @@ import com.mydogspies.xflymetar.VIEWSTATE;
 
 import java.util.Date;
 
+/**
+ * The internal AIRPORT pojo used to store the cleaned/parsed data and distribute it throughout
+ * the observer network.
+ * @author github.com/mydogspies
+ * @since 0.1.0
+ */
 public class Airport {
 
     private long timeStamp;

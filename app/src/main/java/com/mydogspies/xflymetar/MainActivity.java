@@ -22,16 +22,24 @@ import com.mydogspies.xflymetar.apis.APIDataSingleton;
 import com.mydogspies.xflymetar.data.AirportCodeIO;
 import com.mydogspies.xflymetar.data.Metar;
 import com.mydogspies.xflymetar.data.Taf;
+import com.mydogspies.xflymetar.fragments.AirportView;
 import com.mydogspies.xflymetar.fragments.ArrivalMetarHeader;
 import com.mydogspies.xflymetar.fragments.ArrivalTafHeader;
 import com.mydogspies.xflymetar.fragments.DepartureMetarHeader;
+import com.mydogspies.xflymetar.fragments.MetarView;
+import com.mydogspies.xflymetar.fragments.TafView;
 import com.mydogspies.xflymetar.parser.Validators;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements DataObserverIO {
+/**
+ * The main activity class that loads the various fragments into the main view container.
+ * @author github.com/mydogspies
+ * @since 0.1.0
+ */
+public class MainActivity extends AppCompatActivity {
 
     // TODO - IMPORTANT! Implement periodic API data update
 
@@ -48,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
     // if to make an API call or use current saved data
     public static Map<VIEWSTATE, Date> apiTimeStamps;
 
+
+    // This map contains the current data objects in-between the periodic api calls in order to
+    // save amount of times we call the API server.
     public static Map<VIEWSTATE, Object> currentAPIData;
 
     ConstraintLayout mainLayout;
@@ -79,11 +90,10 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         initDataTimestamps();
         initCurrentAPIData();
 
-        // set a new instance for the API data handler
+        // set a new instance for the API data handler singleton
         handler = new APIData();
         APIDataSingleton singleton = APIDataSingleton.getInstance();
         singleton.setHandler(handler);
-        handler.addObserver(this); // TODO only for dev purposes
 
         initBackground();
         initAirportInputs();
@@ -131,21 +141,6 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         fragmentTransaction.commit();
     }
 
-
-
-    /* ACTION EVENTS */
-
-    // TODO dev only for develop-api branch
-    /* Observer methods for incoming data from the APIs */
-
-    @Override
-    public void updateMetarFromAPI(VIEWSTATE state, Metar data) {
-    }
-
-    @Override
-    public void updateTafFromAPI(VIEWSTATE state, Taf data) {
-    }
-
     /* INIT METHODS */
 
     private void initBackground() {
@@ -170,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         // metar data view
         loadDataViews(new DepartureMetarHeader(VIEWSTATE.DEPARTURE_METAR));
-        MetarView departureMetarView = new MetarView();
+        MetarView departureMetarView = new MetarView(VIEWSTATE.DEPARTURE_METAR);
         loadDataViews(departureMetarView);
         dataViewObjects.put(VIEWSTATE.DEPARTURE_METAR, departureMetarView);
 
@@ -184,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
             if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_ENTER) {
 
-                if (validator.validateIcaoCode(airportCode)) {
+                if (validator.validateIcaoCode(airportCode)) { // TODO implement the actual logic in the validator class
                     fetchAPIData(VIEWSTATE.DEPARTURE_METAR, airportCode);
 
                     // Listener and visibility logic for the airport info icon
@@ -209,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         // metar data view
         loadDataViews(new ArrivalMetarHeader(VIEWSTATE.ARRIVAL_METAR));
-        MetarView arrivalMetarView = new MetarView();
+        MetarView arrivalMetarView = new MetarView(VIEWSTATE.ARRIVAL_METAR);
         loadDataViews(arrivalMetarView);
         dataViewObjects.put(VIEWSTATE.ARRIVAL_METAR, arrivalMetarView);
 
@@ -220,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         // taf data view
         loadDataViews(new ArrivalTafHeader(VIEWSTATE.ARRIVAL_TAF));
-        TafView arrivalTafView = new TafView();
+        TafView arrivalTafView = new TafView(VIEWSTATE.ARRIVAL_TAF);
         loadDataViews(arrivalTafView);
         dataViewObjects.put(VIEWSTATE.ARRIVAL_TAF, arrivalTafView);
 
@@ -247,6 +242,13 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
         });
     }
 
+    /**
+     * This method checks if API data has been called within a given period and will either call
+     * the API or fetch pre-saved data and then push it to the handler for direct distribution within
+     * the observer network.
+     * @param state
+     * @param airportCode
+     */
     private void fetchAPIData(VIEWSTATE state, String airportCode) {
 
         long refreshTime = handler.getAPIDataUpdateTime();
@@ -258,8 +260,9 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         // TODO implement a system whereby the logic saves several past states to compare to - when for example going back and forth between same two airport codes
 
+        final boolean stateMetar = state.equals(VIEWSTATE.DEPARTURE_METAR) || state.equals(VIEWSTATE.ARRIVAL_METAR);
         if (timeDiff > refreshTime || !airportCode.toLowerCase().equals(formattedCode)) {
-            if (state.equals(VIEWSTATE.DEPARTURE_METAR) || state.equals(VIEWSTATE.ARRIVAL_METAR)) {
+            if (stateMetar) {
                 handler.loadMetarFromAPI(state, airportCode);
             } else {
                 handler.loadTafFromAPI(state, airportCode);
@@ -267,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements DataObserverIO {
 
         } else {
             Log.i("Xflymetar: FetchAPIData()","Data up to date. Loading from current saved state.");
-            if (state.equals(VIEWSTATE.DEPARTURE_METAR) || state.equals(VIEWSTATE.ARRIVAL_METAR)) {
+            if (stateMetar) {
                 handler.getSavedMetarData(state);
             } else {
                 handler.getSavedTafData(state);

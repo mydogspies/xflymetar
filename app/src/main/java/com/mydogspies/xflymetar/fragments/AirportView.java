@@ -1,4 +1,4 @@
-package com.mydogspies.xflymetar;
+package com.mydogspies.xflymetar.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,13 +10,22 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-import com.mydogspies.xflymetar.apis.APIDataIO;
-import com.mydogspies.xflymetar.apis.APIDataSingleton;
+import com.mydogspies.xflymetar.R;
+import com.mydogspies.xflymetar.ViewLogic;
 
+/**
+ * The fragment that contains the AIRPORT data output.
+ * @author github.com/mydogspies.com
+ * @since 0.1.0
+ */
+public class AirportView extends Fragment implements ViewLogic {
 
-public class MetarView extends Fragment implements ViewLogic {
+    // TODO this method needs to be re-implemented for the coming airport database!
 
-    private static APIDataIO apiIO = APIDataSingleton.getInstance().getHandler();
+    /*
+    NOTE! This method is not fully implemented since we dropped the airport API in favor
+    of developing an internal database. A LOT will change in here!!!
+     */
 
     private View view;
     private ConstraintLayout viewContainer;
@@ -24,14 +33,15 @@ public class MetarView extends Fragment implements ViewLogic {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.metar_readout, container, false);
+        view = inflater.inflate(R.layout.airport_readout, container, false);
         return view;
+        // return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        viewContainer = view.findViewById(R.id.metarReadoutContainer);
+        viewContainer = view.findViewById(R.id.airportReadoutContainer);
+        setVisiblity(false); // start with airport info hidden by default
         super.onViewCreated(view, savedInstanceState);
     }
 

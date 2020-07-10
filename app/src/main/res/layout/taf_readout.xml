@@ -8,13 +8,23 @@
     android:background="@android:color/holo_blue_light">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:id="@+id/fcstTimeToText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="240dp"
-        android:background="@android:color/holo_red_dark"
-        android:text="TAF"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/textColorLinkInverse"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/rawTafText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/holo_purple"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fcstTimeToText" />
 </androidx.constraintlayout.widget.ConstraintLayout>

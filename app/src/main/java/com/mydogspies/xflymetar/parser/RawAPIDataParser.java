@@ -15,7 +15,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Parses the raw pojos from the API into something nicer.
+ * In future versions validation will end up here! // TODO this!
+ * @author github.com/mydogspies.com
+ * @since 0.1.0
+ */
 public class RawAPIDataParser {
+
+    // TODO some nice formatting of the single data entries should happen to too
+    // TODO add error checks
 
     private Map<VIEWSTATE, Object> currentAPIData = MainActivity.currentAPIData;
 
@@ -47,6 +56,9 @@ public class RawAPIDataParser {
     }
 
     public Taf parseTafPojo(VIEWSTATE state, PojoTaf taf) {
+
+        // TODO add error checks
+
         int numResults = taf.getNum_results();
         Instant timeNow = Instant.now();
         boolean apiError = taf.isApiError();
@@ -69,7 +81,7 @@ public class RawAPIDataParser {
                     Instant timeToInsta = Instant.parse(fcstTimeTo);
                     if (timeNow.compareTo(timeToInsta) < 0) {
                         tafObject.setForecastTimeFrom(cast.getFcst_time_from());
-                        Log.i("Xflymetar: (TAF) Forecast_Time_From", cast.getFcst_time_from());
+                        Log.i("Xflymetar: (TAF) Forecast_Time_To", cast.getFcst_time_to());
                         tafObject.setForecastTimeTo(cast.getFcst_time_to());
                         tafObject.setWindDirDegrees(cast.getWind_dir_degrees());
                         tafObject.setWindSpeedKt(cast.getWind_speed_kt());

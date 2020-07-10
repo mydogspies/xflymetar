@@ -1,7 +1,8 @@
 package com.mydogspies.xflymetar;
 
 /**
- * The different data sets that the header_views.xml view can hold.
+ * The different data sets that the layout views can hold. These we use to keep track of what data
+ * is coming down the pipeline to different fragments.
  * @author github.com/mydogspies
  * @since 0.1.0
  */

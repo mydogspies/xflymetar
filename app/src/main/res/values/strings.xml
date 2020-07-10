@@ -5,6 +5,12 @@
     <string name="departure_airport">departure airport</string>
     <string name="arrival_airport">arrival airport</string>
 
+    <string name="arrival_metar_init">ARRIVAL METAR: no airport set</string>
+    <string name="departure_metar_init">DEPARTURE METAR: no airport set</string>
+    <string name="arrival_taf_init">ARRIVAL TAF: no airport set</string>
+    <string name="departure_taf_init">DEPARTURE TAF: no airport set</string>
+
+
     <string name="arrival_metar">ARRIVAL METAR: %1$s [%2$s]</string>
     <string name="arrival_taf">ARRIVAL TAF:  %1$s [%2$s]</string>
     <string name="departure_metar">DEPARTURE METAR:  %1$s [%2$s]</string>
@@ -14,4 +20,8 @@
     <string name="arrival_taf_no_data">ARRIVAL TAF: Data or code error!</string>
     <string name="departure_metar_no_data">DEPARTURE METAR: Data or code error!</string>
     <string name="departure_taf_no_data">DEPARTURE TAF: Data or code error!</string>
+
+    <string name="general_http_error">HTTP response error!</string>
+
+    <string name="forecast_time_to">Fcst to: %1$s</string>
 </resources>

@@ -14,9 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.mydogspies.xflymetar.MainActivity;
-import com.mydogspies.xflymetar.MetarView;
 import com.mydogspies.xflymetar.R;
-import com.mydogspies.xflymetar.TafView;
 import com.mydogspies.xflymetar.VIEWSTATE;
 import com.mydogspies.xflymetar.ViewLogic;
 import com.mydogspies.xflymetar.ViewStyles;
@@ -26,6 +24,14 @@ import com.mydogspies.xflymetar.apis.DataObserverIO;
 import com.mydogspies.xflymetar.data.Metar;
 import com.mydogspies.xflymetar.data.Taf;
 
+/**
+ * This is the header fragment above each data readout (METAR or TAF) view that also contains the
+ * expand/hide icon.
+ * Note that this class must add itself to the observer network via the addObserver() method in
+ * the constructor.
+ * @author github.com/mydogspies
+ * @since 0.1.0
+ */
 public class DepartureTafHeader extends Fragment implements DataObserverIO {
 
     private static APIData apiHandler = APIDataSingleton.getInstance().getHandler();
@@ -104,7 +110,7 @@ public class DepartureTafHeader extends Fragment implements DataObserverIO {
 
         headerText = view.findViewById(R.id.dataTypeText);
         headerText.setTextColor(Color.parseColor(STYLES.TEXT_COLOR));
-        headerText.setText(R.string.departure_taf);
+        headerText.setText(R.string.departure_taf_init);
     }
 
     /* GETTERS and SETTERS */
